@@ -45,10 +45,21 @@ app.get("/u/:id", (req, res) => {
   res.redirect(longURL);
 });
 
+// app.post("/urls/:id/shows", (req, res) => {
+//   const id = req.params.id;
+
+//   res.redirect("/urls");  
+// });
+
 app.get("/urls/:id", (req, res) => {
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
   res.render("urls_show", templateVars);
 });
+
+app.post("/urls/:id", (req, res) => {
+  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
+  res.render("urls_show", templateVars);
+})
 
 
 
