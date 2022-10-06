@@ -18,6 +18,19 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = {
+  userRandomID: {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur",
+  },
+  user2RandomID: {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk",
+  },
+};
+
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
@@ -41,9 +54,19 @@ app.post("/logout", (req, res) => {
 })
 
 // GET register
+app.get("/register", (req, res) => {
+  const templateVars = {
+    id: req.params.id,
+    longURL: urlDatabase[req.params.id],
+    username: req.cookies["username"]
+    };
+  res.render("urls_register", templateVars);
+})
 
 
 // POST register
+
+
 
 app.get("/urls", (req, res) => {
   const templateVars = { 
