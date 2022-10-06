@@ -66,17 +66,22 @@ app.get("/register", (req, res) => {
 
 // POST register
 app.post("/register", (req, res) => {
-  const id = generateRandomString();
   const email = req.body.email;
   const password = req.body.password;
-
-  console.log("id:", id);
-  console.log("email:", email);
-  console.log("password:", password);
+  
+  if (!email || !password) {
+    return res.status(400).send("Please fill in your email And password!");
+  }
+  
+  const userFromDb = findUserByEmail(email);
+  
+  if (userFromDb) {
+    return res.status(400).send("Email already in use!");
+  }
+  
+  const id = generateRandomString();
+  
   users[id] = { id, email, password };
-
-  console.log("users[id]:", users[id]);
-  console.log("users:", users);
 
   res.cookie("user_id", users[id].email);
 
@@ -149,6 +154,15 @@ const generateRandomString = () => {
   return Math.random().toString(36).substring(2,8);
 };  
 
+const findUserByEmail = (email) => {
+  for (const userEmail in users) {
+    const userFromDb = users[userEmail];
+    if (userFromDb.email === email) {
+      return userFromDb;
+    }
+  }
+  return null;
+};
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
