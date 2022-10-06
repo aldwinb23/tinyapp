@@ -36,15 +36,45 @@ app.get("/urls.json", (req, res) => {
 });
 
 // GET login
-app.get("/urls/login", (req, res) => {
-  res.render("urls_login");
+app.get("/login", (req, res) => {
+  const templateVars = {
+    id: req.params.id,
+    longURL: urlDatabase[req.params.id],
+    userId: req.cookies["user_id"]  //username: req.cookies["username"]
+    };
+  res.render("urls_login", templateVars);
 })
 
 // POST login
 app.post("/login", (req, res) =>{
-  const userName = req.body.username;
-  res.cookie("user_id", users[id].email);  //res.cookie("username", userName);
-  res.redirect("/urls");
+  const email = req.body.email;
+  const password = req.body.password;
+
+  if (!email || !password) {
+    return res.status(400).send('Invalid email and/or password!');
+  }
+
+  const user = findUserByEmail(email);
+
+  if (!user) {
+    return res.status(403).send("Email not found!!");
+  }
+
+  if (user.password !== password) {
+    return res.status(403).send("Wrong password!!");
+  }
+
+//   res.cookie("user_id", user.id);  //res.cookie("username", userName);
+
+//   res.redirect("/urls");
+// ///
+
+  res.cookie("user_id", email);
+
+  res.redirect("/urls"); 
+
+
+
 })
 
 // POST logout
@@ -97,13 +127,14 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-
+// Post Delete
 app.post("/urls/:id/delete", (req, res) => {
   const id = req.params.id;
   delete urlDatabase[id]
   res.redirect("/urls");  
 });
 
+// Get New 
 app.get("/urls/new", (req, res) => {
   const templateVars = { 
     userId: req.cookies["user_id"] // username: req.cookies["username"]
@@ -119,12 +150,14 @@ app.post("/urls", (req, res) => {
   res.redirect(`urls/${id}`);  
 });
 
+// Get New Id
 app.get("/u/:id", (req, res) => {
   const id = req.params.id;
   const longURL = urlDatabase[id];
   res.redirect(longURL);
 });
 
+// Get New Id
 app.get("/urls/:id", (req, res) => {
   const templateVars = {
     id: req.params.id,
@@ -150,6 +183,7 @@ app.post("/urls/:id/edit", (req, res) => {
 })
 
 
+// Helper Functions
 const generateRandomString = () => {
   return Math.random().toString(36).substring(2,8);
 };  
@@ -164,6 +198,7 @@ const findUserByEmail = (email) => {
   return null;
 };
 
+// Listen here port!!
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
