@@ -43,13 +43,13 @@ app.get("/urls/login", (req, res) => {
 // POST login
 app.post("/login", (req, res) =>{
   const userName = req.body.username;
-  res.cookie("username", userName);
+  res.cookie("user_id", users[id].email);  //res.cookie("username", userName);
   res.redirect("/urls");
 })
 
 // POST logout
 app.post("/logout", (req, res) => {
-  res.clearCookie("username");
+  res.clearCookie("user_id");
   res.redirect("/urls");
 })
 
@@ -58,20 +58,36 @@ app.get("/register", (req, res) => {
   const templateVars = {
     id: req.params.id,
     longURL: urlDatabase[req.params.id],
-    username: req.cookies["username"]
+    userId: req.cookies["user_id"]  //username: req.cookies["username"]
     };
   res.render("urls_register", templateVars);
 })
 
 
 // POST register
+app.post("/register", (req, res) => {
+  const id = generateRandomString();
+  const email = req.body.email;
+  const password = req.body.password;
 
+  console.log("id:", id);
+  console.log("email:", email);
+  console.log("password:", password);
+  users[id] = { id, email, password };
 
+  console.log("users[id]:", users[id]);
+  console.log("users:", users);
 
+  res.cookie("user_id", users[id].email);
+
+  res.redirect("/urls");  
+})
+
+// Get Homepage/Index
 app.get("/urls", (req, res) => {
   const templateVars = { 
     urls: urlDatabase,
-    username: req.cookies["username"]
+    userId: req.cookies["user_id"] //username: req.cookies["username"]
   }
   res.render("urls_index", templateVars);
 });
@@ -85,7 +101,7 @@ app.post("/urls/:id/delete", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
   const templateVars = { 
-    username: req.cookies["username"]
+    userId: req.cookies["user_id"] // username: req.cookies["username"]
   }
   res.render("urls_new", templateVars);
 });
@@ -108,7 +124,7 @@ app.get("/urls/:id", (req, res) => {
   const templateVars = {
     id: req.params.id,
     longURL: urlDatabase[req.params.id],
-    username: req.cookies["username"]
+    userId: req.cookies["user_id"]  // username: req.cookies["username"]
     };
   res.render("urls_show", templateVars);
 });
