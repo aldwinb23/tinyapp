@@ -4,6 +4,7 @@ const morgan = require("morgan");
 const cookieParser = require('cookie-parser')
 const app = express();
 const PORT = 8080; // default port 8080
+const bcrypt = require("bcryptjs");
 
 
 app.set("view engine", "ejs");
@@ -11,6 +12,8 @@ app.set("view engine", "ejs");
 app.use(morgan("dev"));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+
 
 
 // const urlDatabase = {
@@ -110,16 +113,26 @@ app.post("/login", (req, res) =>{
     return res.status(403).send("Email not found!!");
   }
   
-  if (user.password !== password) {
+  // if (user.password !== password) {
+    //   return res.status(403).send("Wrong password!!");
+    // }
+    
+  const hashedPassword = bcrypt.compareSync(password, user.password);   ///
+  
+  if (hashedPassword === false) {     ///////
     return res.status(403).send("Wrong password!!");
   }
-  
+
   const id = user.id
 
   res.cookie("user_id", id);
   
   res.redirect("/urls"); 
 })
+
+// bcrypt.compareSync("purple-monkey-dinosaur", hashedPassword); // returns true
+// bcrypt.compareSync("pink-donkey-minotaur", hashedPassword); // returns false
+
 
 
 // GET logout ///////////////////////////////
@@ -159,6 +172,8 @@ app.get("/register", (req, res) => {
 app.post("/register", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
+  const hashedPassword = bcrypt.hashSync(password, 10);   ///
+
   
   if (!email || !password) {
     return res.status(400).send("Please fill in your email And password!");
@@ -172,12 +187,21 @@ app.post("/register", (req, res) => {
   
   const id = generateRandomString();
   
-  users[id] = { id, email, password };
+  // users[id] = { id, email, password };
+  users[id] = { id, email, password: hashedPassword };
+
   
   res.cookie("user_id", users[id].id);
   
   res.redirect("/urls");  
 })
+
+
+// const password = "purple-monkey-dinosaur"; // found in the req.body object
+// const hashedPassword = bcrypt.hashSync(password, 10);
+
+
+
 
 
 // Post Delete /////////////////////////
