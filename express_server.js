@@ -6,6 +6,8 @@ const app = express();
 const PORT = 8080; // default port 8080
 const bcrypt = require("bcryptjs");
 const cookieSession = require('cookie-session')
+const { findUserByEmail } = require('./helpers.js');
+
 
 
 app.set("view engine", "ejs");
@@ -119,7 +121,7 @@ app.post("/login", (req, res) =>{
     return res.status(400).send('Invalid email and/or password!');
   }
   
-  const user = findUserByEmail(email);
+  const user = findUserByEmail(email, users);
   
   if (!user) {
     return res.status(403).send("Email not found!!");
@@ -194,7 +196,7 @@ app.post("/register", (req, res) => {
     return res.status(400).send("Please fill in your email And password!");
   }
   
-  const userFromDb = findUserByEmail(email);
+  const userFromDb = findUserByEmail(email, users);
   
   if (userFromDb) {
     return res.status(400).send("Email already in use!");
@@ -383,15 +385,25 @@ const generateRandomString = () => {
   return Math.random().toString(36).substring(2,8);
 };  
 
-const findUserByEmail = (email) => {
-  for (const userEmail in users) {
-    const userFromDb = users[userEmail];
-    if (userFromDb.email === email) {
-      return userFromDb;
-    }
-  }
-  return null;
-};
+// const findUserByEmail = (email) => {
+//   for (const userEmail in users) {
+//     const userFromDb = users[userEmail];
+//     if (userFromDb.email === email) {
+//       return userFromDb;
+//     }
+//   }
+//   return null;
+// };
+
+// const findUserByEmail = (email, database) => {
+//   for (const userEmail in database) {
+//     const userFromDb = database[userEmail];
+//     if (userFromDb.email === email) {
+//       return userFromDb;
+//     }
+//   }
+//   return null;
+// };
 
 const urlsForUser = (id) => {
   const urls = {};
