@@ -19,7 +19,26 @@
     <%- include('partials/_header') %>
   </head>
   <body>
+    <br>
+    <h3><strong><Welcome to TinyApp!!</strong></h3>
     <main style="margin: 1em;">
+      <% if (!userId) { %>
+      <h4>
+        <br>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col"></th>
+            <th scope="col"></th>
+            <th scope="col"></th>
+            <th scope="col">Register <a href="/register">here</a>
+            </th>
+            <th scope="col">Already have an account?? <a href="/login">Login!!</a></th>
+          </tr>
+        </thead>
+        <tbody>
+        </h4>
+      <% } else { %>
       <h3>My URLs</h3>
       <table class="table">
         <thead>
@@ -31,21 +50,10 @@
           </tr>
         </thead>
         <tbody>
-          <% for (let id in urls) { %>
+          <% for (let id in url) { %>
             <tr>
-              <% if (!userId) { %>
                 <td> <%= id %> </td>
-                <td> <%= urls[id] %></td>
-                <td><form method="GET" action="/login">
-                  <button type="submit">Edit</button>
-                </form></td>
-                <td><form method="GET" action="/login">
-                  <button type="submit">Delete</button>
-                </form></td>
-
-              <% } else { %>
-                <td> <%= id %> </td>
-                <td> <%= urls[id] %></td>
+                <td> <%= url[id].longURL %></td>
                 <td><form method="POST" action="/urls/<%- id %>">
                   <button type="submit">Edit</button>
                 </form></td>
