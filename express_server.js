@@ -25,11 +25,19 @@ app.get("/urls.json", (req, res) => {
 /////// GETS ///////
 
 // Get Homepage/Index
+app.get("/", (req,res) => {
+  if (req.session.userid) {
+    res.redirect("/urls")
+  } else {
+    res.redirect("/login");
+  }
+})
+
 app.get("/urls", (req, res) => {
   if (!req.session.userid) {
     const templateVars = {
       urls: urlDatabase,
-      userId: req.session.userid
+      user: users[req.session.userid]
     };
     return res.render("urls_index", templateVars);
   }
@@ -39,7 +47,7 @@ app.get("/urls", (req, res) => {
 
   const templateVars = {
     url: url,
-    userId: req.session.userid
+    user: users[req.session.userid]
   };
 
   res.render("urls_index", templateVars);
@@ -49,10 +57,13 @@ app.get("/urls", (req, res) => {
 // GET Login
 app.get("/login", (req, res) => {
   const templateVars = {
-    userId: req.session.userid
+    user: users[req.session.userid]
+    
   };
+
+  console.log("users:", );
   
-  if (templateVars.userId) {
+  if (templateVars.user) {
     return res.redirect("/urls");
   }
   
@@ -62,11 +73,17 @@ app.get("/login", (req, res) => {
 
 // GET Register
 app.get("/register", (req, res) => {
-  const templateVars = {
-    userId: req.session.userid
-  };
   
-  if (templateVars.userId) {
+
+  // console.log("userIdtop:", userId)
+
+  const templateVars = {
+    user: users[req.session.userid]
+  };
+
+  console.log("userIdbottom:", templateVars)
+  
+  if (templateVars.user) {
     return res.redirect("/urls");
   }
   
@@ -74,13 +91,13 @@ app.get("/register", (req, res) => {
 });
     
     
-// Get New /////////////////////////////////
+// Get New
 app.get("/urls/new", (req, res) => {
   const templateVars = {
-    userId: req.session.userid
+    user: users[req.session.userid]
   };
   
-  if (!templateVars.userId) {
+  if (!templateVars.user) {
     return res.redirect("/login");
   }
   
@@ -88,9 +105,14 @@ app.get("/urls/new", (req, res) => {
 });
 
 
-// Get New Id ///////////////////////////
+// Get New Id
 app.get("/u/:id", (req, res) => {
   const id = req.params.id;
+  
+  if (!urlDatabase[id]) {
+    return res.send("<strong>That URL does not exist!</strong>");
+  }
+ 
   const longURL = urlDatabase[id].longURL;
 
   res.redirect(longURL);
@@ -119,7 +141,7 @@ app.get("/urls/:id", (req, res) => {
   const templateVars = {
     id: req.params.id,
     longURL: newURL,
-    userId: req.session.userid
+    user: users[req.session.userid]
   };
 
   res.render("urls_show", templateVars);
